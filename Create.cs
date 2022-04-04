@@ -1,0 +1,68 @@
+using System.Text;
+using System.Text.Json;
+using rotrut.Models;
+
+namespace rotrut;
+public static class Create
+{
+    static readonly string directory =
+        Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+    static readonly string path = Path.Combine(directory, ".nuget", "packages", "bookrotandrut", "1.0.1", "content", "Serialization.csv");
+
+    public static void ParseFile(FileInfo file)
+    {
+        string jsonString = File.ReadAllText(file.FullName);
+        using var document = JsonDocument.Parse(jsonString);
+
+        var element = document.RootElement.GetProperty("beslut").EnumerateArray();
+
+        var cases = element.Select(c => c.Deserialize<Case>());
+
+        File.Delete(path);
+        Console.WriteLine("Dessa beslut är sparade:");
+        foreach (var @case in cases)
+        {
+            var merged = MergeDoubleInvoiceNumbers(@case.Payments);
+            CreateCsvFile(merged);
+            Console.WriteLine($"{@case.Name}");
+        }
+    }
+
+    static IEnumerable<Payment> MergeDoubleInvoiceNumbers(IEnumerable<Payment> payments)
+    {
+        var duplicates = payments.GroupBy(p => p.InvoiceNumber)
+            .Where(g => g.Count() > 1)
+            .Select(x => new
+            {
+                x.Key,
+                Amount = x.Sum(p => p.ApprovedAmount)
+            }).ToList();
+
+        if (duplicates is not null)
+        {
+            foreach (var item in duplicates)
+            {
+                payments = payments.Where(x => x.InvoiceNumber != item.Key)
+                    .Append(new Payment
+                    {
+                        InvoiceNumber = item.Key,
+                        ApprovedAmount = item.Amount
+                    }
+                );
+            }
+        }
+
+        return payments;
+    }
+
+    static void CreateCsvFile(IEnumerable<Payment> payments)
+    {
+        string csv = payments.Aggregate(
+            new StringBuilder(),
+            (sb, s) => sb.Append(s),
+            sb => sb.ToString());
+
+        File.AppendAllText(path, csv);
+    }
+}
