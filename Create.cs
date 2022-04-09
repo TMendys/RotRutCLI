@@ -31,7 +31,7 @@ public static class Create
 
     public static IEnumerable<Payment> MergeDoubleInvoiceNumbers(IEnumerable<Payment> payments)
     {
-        var withOutDuplicates = payments.GroupBy(p => p.InvoiceNumber)
+        var withoutDuplicates = payments.GroupBy(p => p.InvoiceNumber)
             .Where(g => g.Count() > 1)
             .Select(x => new Payment
             {
@@ -39,7 +39,7 @@ public static class Create
                 ApprovedAmount = x.Sum(p => p.ApprovedAmount)
             }).UnionBy(payments, x => x.InvoiceNumber);
 
-        return withOutDuplicates;
+        return withoutDuplicates;
     }
 
     static void CreateCsvFile(IEnumerable<Payment> payments)
