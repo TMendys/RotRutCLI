@@ -23,23 +23,28 @@ public static class Create
         Console.WriteLine("Dessa beslut är sparade:");
         foreach (var @case in cases)
         {
-            var merged = MergeDoubleInvoiceNumbers(@case.Payments);
-            CreateCsvFile(merged);
+            var payments = @case.Payments.ToList();
+            if (payments.ContainsDoubleInvoiceNumbers())
+            {
+                payments.MergeDoubleInvoiceNumbers();
+            }
+            CreateCsvFile(payments);
             Console.WriteLine($"{@case.Name}");
         }
     }
 
-    public static IEnumerable<Payment> MergeDoubleInvoiceNumbers(IEnumerable<Payment> payments)
-    {
-        var withoutDuplicates = payments.GroupBy(p => p.InvoiceNumber)
-            .Where(g => g.Count() > 1)
+    public static IEnumerable<Payment> MergeDoubleInvoiceNumbers(this IEnumerable<Payment> payments) =>
+        payments.GroupBy(p => p.InvoiceNumber)
             .Select(x => new Payment
             {
                 InvoiceNumber = x.Key,
                 ApprovedAmount = x.Sum(p => p.ApprovedAmount)
-            }).UnionBy(payments, x => x.InvoiceNumber);
+            });
 
-        return withoutDuplicates;
+    static bool ContainsDoubleInvoiceNumbers(this IEnumerable<Payment> payments)
+    {
+        HashSet<Payment> knownKeys = new();
+        return payments.Any(item => !knownKeys.Add(item));
     }
 
     static void CreateCsvFile(IEnumerable<Payment> payments)
