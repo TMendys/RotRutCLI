@@ -29,31 +29,17 @@ public static class Create
         }
     }
 
-    static IEnumerable<Payment> MergeDoubleInvoiceNumbers(IEnumerable<Payment> payments)
+    public static IEnumerable<Payment> MergeDoubleInvoiceNumbers(IEnumerable<Payment> payments)
     {
-        var duplicates = payments.GroupBy(p => p.InvoiceNumber)
+        var withOutDuplicates = payments.GroupBy(p => p.InvoiceNumber)
             .Where(g => g.Count() > 1)
-            .Select(x => new
+            .Select(x => new Payment
             {
-                x.Key,
-                Amount = x.Sum(p => p.ApprovedAmount)
-            }).ToList();
+                InvoiceNumber = x.Key,
+                ApprovedAmount = x.Sum(p => p.ApprovedAmount)
+            }).UnionBy(payments, x => x.InvoiceNumber);
 
-        if (duplicates is not null)
-        {
-            foreach (var item in duplicates)
-            {
-                payments = payments.Where(x => x.InvoiceNumber != item.Key)
-                    .Append(new Payment
-                    {
-                        InvoiceNumber = item.Key,
-                        ApprovedAmount = item.Amount
-                    }
-                );
-            }
-        }
-
-        return payments;
+        return withOutDuplicates;
     }
 
     static void CreateCsvFile(IEnumerable<Payment> payments)
