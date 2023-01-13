@@ -6,9 +6,9 @@ namespace RotRut;
 public static class Create
 {
     static readonly string directory =
-        Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        Environment.CurrentDirectory;
 
-    static readonly string path = Path.Combine(directory, ".nuget", "packages", "bookrotandrut", "1.0.1", "content", "Serialization.csv");
+    static readonly string path = Path.Combine(directory, "Serialization.csv");
 
     public static void ParseFile(FileInfo? file)
     {
