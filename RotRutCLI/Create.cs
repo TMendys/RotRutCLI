@@ -10,8 +10,11 @@ public static class Create
 
     static readonly string path = Path.Combine(directory, ".nuget", "packages", "bookrotandrut", "1.0.1", "content", "Serialization.csv");
 
-    public static void ParseFile(FileInfo file)
+    public static void ParseFile(FileInfo? file)
     {
+        if (file is null) throw new ArgumentNullException(nameof(file),
+            message: "Du måste välja en fil.");
+
         string jsonString = File.ReadAllText(file.FullName);
         using var document = JsonDocument.Parse(jsonString);
 

@@ -37,12 +37,12 @@ createCommand.AddAlias("create");
 
 rootCommand.Add(createCommand);
 
-rootCommand.SetHandler((FileInfo file) =>
+rootCommand.SetHandler((FileInfo? file) =>
 {
     Create.ParseFile(file);
 }, fileOption);
 
-createCommand.SetHandler((FileInfo file) =>
+createCommand.SetHandler((FileInfo? file) =>
 {
     Create.ParseFile(file);
 }, fileOption);
