@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/rotrut.csproj",
+                "${workspaceFolder}/XmlSerializer/XmlSerializer.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -19,7 +19,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/rotrut.csproj",
+                "${workspaceFolder}/XmlSerializer/XmlSerializer.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -33,7 +33,7 @@
                 "watch",
                 "run",
                 "--project",
-                "${workspaceFolder}/rotrut.csproj"
+                "${workspaceFolder}/XmlSerializer/XmlSerializer.csproj"
             ],
             "problemMatcher": "$msCompile"
         }
