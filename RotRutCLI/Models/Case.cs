@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace rotrut.Models;
+namespace RotRut.Models;
 
 // public class Case
 // {

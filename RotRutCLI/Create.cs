@@ -1,8 +1,8 @@
 using System.Text;
 using System.Text.Json;
-using rotrut.Models;
+using RotRut.Models;
 
-namespace rotrut;
+namespace RotRut;
 public static class Create
 {
     static readonly string directory =

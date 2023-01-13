@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using static System.Environment;
 
-namespace rotrut.Models;
+namespace RotRut.Models;
 
 public record struct Payment(
     [property: JsonPropertyName("fakturanummer")] string InvoiceNumber,

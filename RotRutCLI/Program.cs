@@ -2,7 +2,7 @@
 using System.CommandLine.Hosting;
 using System.CommandLine.Builder;
 using System.CommandLine.Parsing;
-using rotrut;
+using RotRut;
 
 var fileOption = new Option<FileInfo?>(
     name: "--fil",
