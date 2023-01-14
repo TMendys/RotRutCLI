@@ -60,5 +60,6 @@ public class CreateTest
         var newPayments = payments.MergeDoubleInvoiceNumbers();
 
         Assert.IsTrue(newPayments.Count() == 6);
+        Assert.IsTrue(newPayments.Select(x => x.ApprovedAmount).Contains(300));
     }
 }
