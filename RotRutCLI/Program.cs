@@ -10,6 +10,7 @@ var fileOption = new Option<FileInfo?>(
     isDefault: true,
     parseArgument: result =>
     {
+
         if (result.Tokens.Count == 0)
         {
             result.ErrorMessage = "Du måste välja en fil.";
@@ -24,28 +25,44 @@ var fileOption = new Option<FileInfo?>(
         }
 
         return new FileInfo(filePath);
-    });
+    })
+{ IsRequired = true };
 
 fileOption.AddAlias("--file");
 fileOption.AddAlias("-f");
 
+var directoryOption = new Option<DirectoryInfo?>(
+    name: "--output",
+    description: "Var den nya filen ska sparas",
+    isDefault: true,
+    parseArgument: result =>
+    {
+        if (result.Tokens.Count == 0)
+        {
+            return new DirectoryInfo(Environment.CurrentDirectory);
+        }
+
+        var directoryPath = result.Tokens.Single().Value;
+        if (!Directory.Exists(directoryPath))
+        {
+            Directory.CreateDirectory(directoryPath);
+        }
+
+        return new DirectoryInfo(directoryPath);
+    }
+);
+
+directoryOption.AddAlias("-o");
+
 var rootCommand = new RootCommand("Läser skatteverkets beslutsfil och spara ner informationen i en cvs fil för att användas av en robot på Visma Eekonomi.");
-rootCommand.AddGlobalOption(fileOption);
+rootCommand.AddOption(fileOption);
+rootCommand.AddOption(directoryOption);
 
-var createCommand = new Command("skapa", "Skapa ny csv-fil.");
-createCommand.AddAlias("create");
-
-rootCommand.Add(createCommand);
-
-rootCommand.SetHandler((FileInfo? file) =>
+rootCommand.SetHandler((FileInfo? file, DirectoryInfo? directory) =>
 {
-    Create.ParseFile(file);
-}, fileOption);
-
-createCommand.SetHandler((FileInfo? file) =>
-{
-    Create.ParseFile(file);
-}, fileOption);
+    Parse parser = new(directory);
+    parser.ParseFile(file);
+}, fileOption, directoryOption);
 
 var commandLineBuilder = new CommandLineBuilder(rootCommand)
     .UseDefaults();

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RotRut.Models;
+using RotRut;
 
 namespace RotRutTest;
 
@@ -21,12 +22,12 @@ public class CreateTest
             },
             new Payment
             {
-                InvoiceNumber = "1001",
+                InvoiceNumber = "1002",
                 ApprovedAmount = 200
             },
             new Payment
             {
-                InvoiceNumber = "1002",
+                InvoiceNumber = "1001",
                 ApprovedAmount = 100
             },
             new Payment
@@ -56,7 +57,7 @@ public class CreateTest
             }
         };
 
-        var newPayments = RotRut.Create.MergeDoubleInvoiceNumbers(payments);
+        var newPayments = payments.MergeDoubleInvoiceNumbers();
 
         Assert.IsTrue(newPayments.Count() == 6);
     }

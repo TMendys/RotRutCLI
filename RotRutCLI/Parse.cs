@@ -4,17 +4,30 @@ using RotRut.Models;
 
 namespace RotRut;
 
-/*
-public static class Create
+public class Parse
 {
-    static readonly string directory = Environment.CurrentDirectory;
 
-    static readonly string path = Path.Combine(directory, "Serialization.csv");
+    private readonly string directory;
 
-    public static void ParseFile(FileInfo? file)
+    public Parse(DirectoryInfo? outputDirectory)
     {
-        if (file is null) throw new ArgumentNullException(nameof(file),
+        if (outputDirectory is null)
+        {
+            throw new ArgumentNullException(nameof(outputDirectory));
+        }
+
+        directory = outputDirectory.FullName;
+    }
+
+    private string Path { get => System.IO.Path.Combine(directory, "Serialization.csv"); }
+
+    public void ParseFile(FileInfo? file)
+    {
+        if (file is null)
+        {
+            throw new ArgumentNullException(nameof(file),
             message: "Du måste välja en fil.");
+        }
 
         string jsonString = File.ReadAllText(file.FullName);
         using var document = JsonDocument.Parse(jsonString);
@@ -23,7 +36,7 @@ public static class Create
 
         var cases = element.Select(c => c.Deserialize<Case>());
 
-        File.Delete(path);
+        File.Delete(Path);
         Console.WriteLine("Dessa beslut är sparade:");
         foreach (var @case in cases)
         {
@@ -37,27 +50,13 @@ public static class Create
         }
     }
 
-    public static IEnumerable<Payment> MergeDoubleInvoiceNumbers(this IEnumerable<Payment> payments) =>
-        payments.GroupBy(p => p.InvoiceNumber)
-            .Select(x => new Payment
-            {
-                InvoiceNumber = x.Key,
-                ApprovedAmount = x.Sum(p => p.ApprovedAmount)
-            });
-
-    static bool ContainsDoubleInvoiceNumbers(this IEnumerable<Payment> payments)
-    {
-        HashSet<Payment> knownKeys = new();
-        return payments.Any(item => !knownKeys.Add(item));
-    }
-
-    static void CreateCsvFile(IEnumerable<Payment> payments)
+    private void CreateCsvFile(IEnumerable<Payment> payments)
     {
         string csv = payments.Aggregate(
             new StringBuilder(),
             (sb, s) => sb.Append(s),
             sb => sb.ToString());
 
-        File.AppendAllText(path, csv);
+        File.AppendAllText(Path, csv);
     }
-}*/
+}
