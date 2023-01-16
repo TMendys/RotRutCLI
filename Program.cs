@@ -4,13 +4,14 @@ using System.CommandLine.Builder;
 using System.CommandLine.Parsing;
 using RotRut;
 
+// TODO: Add logging and exceptionhandling
+
 var fileOption = new Option<FileInfo?>(
     name: "--fil",
     description: "Filen som ska läsas.",
     isDefault: true,
     parseArgument: result =>
     {
-
         if (result.Tokens.Count == 0)
         {
             result.ErrorMessage = "Du måste välja en fil.";

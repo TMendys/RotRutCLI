@@ -28,17 +28,23 @@ public class Parse
             message: "Du måste välja en fil.");
         }
 
-        string jsonString = File.ReadAllText(file.FullName);
-        using var document = JsonDocument.Parse(jsonString);
-
-        var element = document.RootElement.GetProperty("beslut").EnumerateArray();
-
-        var cases = element.Select(c => c.Deserialize<Case>());
-
-        File.Delete(path);
-        Console.WriteLine("Dessa beslut är sparade:");
-
-        return ListAllPayments(cases);
+        try
+        {
+            string jsonString = File.ReadAllText(file.FullName);
+            using var document = JsonDocument.Parse(jsonString);
+            var element = document.RootElement.GetProperty("beslut").EnumerateArray();
+            var cases = element.Select(c => c.Deserialize<Case>());
+            Console.WriteLine("Dessa beslut är sparade:");
+            File.Delete(path);
+            return ListAllPayments(cases);
+        }
+        // Catch JsonException and KeyNotFoundException
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+            Directory.Delete(directory);
+            throw;
+        }
     }
 
     private static List<Payment> ListAllPayments(IEnumerable<Case> cases)
