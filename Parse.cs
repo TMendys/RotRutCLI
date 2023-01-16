@@ -6,7 +6,6 @@ namespace RotRut;
 
 public class Parse
 {
-
     private readonly string directory;
 
     public Parse(DirectoryInfo? outputDirectory)
@@ -40,11 +39,14 @@ public class Parse
         Console.WriteLine("Dessa beslut är sparade:");
         foreach (var @case in cases)
         {
-            var payments = @case.Payments.ToList();
-            if (payments.ContainsDoubleInvoiceNumbers())
-            {
-                payments.MergeDoubleInvoiceNumbers();
-            }
+            var payments = @case.Payments
+                .GroupBy(x => x.InvoiceNumber)
+                .Select(x => new Payment
+                {
+                    InvoiceNumber = x.Key,
+                    ApprovedAmount = x.Sum(x => x.ApprovedAmount)
+                });
+
             CreateCsvFile(payments);
             Console.WriteLine($"{@case.Name}");
         }
