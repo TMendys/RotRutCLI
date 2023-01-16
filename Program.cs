@@ -61,7 +61,8 @@ rootCommand.AddOption(directoryOption);
 rootCommand.SetHandler((FileInfo? file, DirectoryInfo? directory) =>
 {
     Parse parser = new(directory);
-    parser.ParseFile(file);
+    var payments = parser.ParseFile(file);
+    parser.CreateCsvFile(payments);
 }, fileOption, directoryOption);
 
 var commandLineBuilder = new CommandLineBuilder(rootCommand)

@@ -4,4 +4,4 @@ namespace RotRut.Models;
 
 public record struct Case(
     [property: JsonPropertyName("namn")] string Name,
-    [property: JsonPropertyName("arenden")] IEnumerable<Payment> Payments);
+    [property: JsonPropertyName("arenden")] List<Payment> Payments);

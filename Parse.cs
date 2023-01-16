@@ -7,6 +7,7 @@ namespace RotRut;
 public class Parse
 {
     private readonly string directory;
+    private readonly string path;
 
     public Parse(DirectoryInfo? outputDirectory)
     {
@@ -16,11 +17,10 @@ public class Parse
         }
 
         directory = outputDirectory.FullName;
+        path = Path.Combine(directory, "Serialization.csv");
     }
 
-    private string Path { get => System.IO.Path.Combine(directory, "Serialization.csv"); }
-
-    public void ParseFile(FileInfo? file)
+    public List<Payment> ParseFile(FileInfo? file)
     {
         if (file is null)
         {
@@ -35,30 +35,37 @@ public class Parse
 
         var cases = element.Select(c => c.Deserialize<Case>());
 
-        File.Delete(Path);
+        File.Delete(path);
         Console.WriteLine("Dessa beslut är sparade:");
+
+        return ListAllPayments(cases);
+    }
+
+    private static List<Payment> ListAllPayments(IEnumerable<Case> cases)
+    {
+        List<Payment> payments = new();
         foreach (var @case in cases)
         {
-            var payments = @case.Payments
+            Console.WriteLine($"{@case.Name}");
+
+            payments.AddRange(@case.Payments
                 .GroupBy(x => x.InvoiceNumber)
                 .Select(x => new Payment
                 {
                     InvoiceNumber = x.Key,
                     ApprovedAmount = x.Sum(x => x.ApprovedAmount)
-                });
-
-            CreateCsvFile(payments);
-            Console.WriteLine($"{@case.Name}");
+                }));
         }
+        return payments;
     }
 
-    private void CreateCsvFile(IEnumerable<Payment> payments)
+    public void CreateCsvFile(List<Payment> payments)
     {
         string csv = payments.Aggregate(
             new StringBuilder(),
             (sb, s) => sb.Append(s),
             sb => sb.ToString());
 
-        File.AppendAllText(Path, csv);
+        File.AppendAllText(path, csv);
     }
 }
