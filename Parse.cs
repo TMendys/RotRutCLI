@@ -35,10 +35,9 @@ public class Parse
             var element = document.RootElement.GetProperty("beslut").EnumerateArray();
             var cases = element.Select(c => c.Deserialize<Case>());
             Console.WriteLine("Dessa beslut är sparade:");
-            File.Delete(path);
             return ListAllPayments(cases);
         }
-        // Catch JsonException and KeyNotFoundException
+        // TODO: Catch JsonException and KeyNotFoundException
         catch (Exception e)
         {
             Console.WriteLine(e.Message);
@@ -67,6 +66,7 @@ public class Parse
 
     public void CreateCsvFile(List<Payment> payments)
     {
+        File.Delete(path);
         string csv = payments.Aggregate(
             new StringBuilder(),
             (sb, s) => sb.Append(s),
